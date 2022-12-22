@@ -1,91 +1,64 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from './page.module.css'
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const inter = Inter({ subsets: ['latin'] })
+interface Note {
+  title: string;
+  notes: string;
+}
 
 export default function Home() {
+  const router = useRouter();
+  const [note, setNote] = useState<Note>({
+    title: "",
+    notes: "",
+  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    alert(note.title);
+    try {
+      fetch("http://localhost:3000/api/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: note.title,
+          note: note.notes,
+        }),
+      }).then(() => {
+        setNote({ title: "", notes: "" });
+        router.push("/notes");
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="max-w-4xl bg-slate-500 m-auto h-screen flex flex-col items-center py-6">
+      <h1 className="text-4xl font-bold text-white mb-5">Add New Note</h1>
+      <form className="w-1/2" onSubmit={handleSubmit}>
+        <div className="flex flex-col w-full">
+          <input
+            type="text"
+            className="px-3 py-2 border-solid border-2 border-black mb-3 rounded-sm"
+            placeholder="Title"
+            value={note.title}
+            onChange={(e) => setNote({ ...note, title: e.target.value })}
+          />
+          <textarea
+            placeholder="Notes"
+            className="px-3 py-2 border-solid border-2 border-black mb-3 rounded-sm"
+            value={note.notes}
+            onChange={(e) => setNote({ ...note, notes: e.target.value })}
+          ></textarea>
+          <button
+            type="submit"
+            className="bg-blue-500 py-2 border-2 text-white font-bold hover:bg-blue-400 border-black"
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            Save
+          </button>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      </form>
+    </div>
+  );
 }
