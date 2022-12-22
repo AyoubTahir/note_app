@@ -17,7 +17,7 @@ export default function Home() {
     e.preventDefault();
     alert(note.title);
     try {
-      fetch("http://localhost:3000/api/create", {
+      fetch("https://note-app-tawny-eight.vercel.app/api/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
